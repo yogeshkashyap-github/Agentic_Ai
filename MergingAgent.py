@@ -30,7 +30,7 @@ def data_merger(df1,df2,on,how):
 
 
 
-def agent_decide(user_query,df1_summary,df2_summary,sheet_name):
+def agent_decide(user_query,df1_summary,df2_summary):
 
     SYSTEM_PROMPT = """
     Your goal:
@@ -59,7 +59,7 @@ def agent_decide(user_query,df1_summary,df2_summary,sheet_name):
 
     decision = response.choices[0].message.content.replace("```json","").replace("```","")
 
-    print("\n",decision,"\n\n")
+    print("\nAI Decision",decision,"\n\n")
 
     return decision
 
@@ -74,6 +74,12 @@ sheetnumber = 0
 
 for sheet_name, df in sheets.items():
 
+    print(f"--------------------------- Sheet : {sheet_name} -------------------------------------------\n\n",df,"\n-------------------------------------------------------------------------------------------------\n\n")
+
+for sheet_name, df in sheets.items():
+
+
+
     if(sheetnumber == 0):
         super_df = df.copy()
         sheetnumber+=1
@@ -84,9 +90,9 @@ for sheet_name, df in sheets.items():
     summary2 = summarize_excel(df)
 
 
-    user_query = "Merge both "
+    user_query =  input("Enter the User Query to Merge the data : \n>>") or "Merge both"
     
-    decision = agent_decide(user_query,summary1,summary2,sheet_name)
+    decision = agent_decide(user_query,summary1,summary2)
 
 
     rules = json.loads(decision)    

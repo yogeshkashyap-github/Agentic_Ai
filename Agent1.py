@@ -39,7 +39,8 @@ def agent_decide(user_query,excel_summary,sheet_naam):
 
     Sample Output As JSON
     { subset : <suitable subset as per user query>,
-        keep : <keep>
+        keep : <keep>,
+        message:<short reply and reason>
     }
     """
 
@@ -55,7 +56,7 @@ def agent_decide(user_query,excel_summary,sheet_naam):
 
     decision = response.choices[0].message.content.replace("```json","").replace("```","")
 
-    print(decision)
+    print("\n AI Decision",decision,"\n")
 
     return decision
 
@@ -68,8 +69,10 @@ sheets = pd.read_excel("input.xlsx",sheet_name=None)
 for sheet_name, df in sheets.items():
     summary = summarize_excel(df)
 
+    print("--------------------------- Before -------------------------------------------\n\n",df,"\n--------------------------------------------------------------------")
 
-    user_query = "Kindly remove the duplicated acc to the dept"
+
+    user_query =  input("\n\nEnter Your Query How You want to Clean Data\n >>") or "Kindly remove the duplicates as per best column"
     decision = agent_decide(user_query,summary,sheet_name)
 
 
@@ -81,7 +84,7 @@ for sheet_name, df in sheets.items():
         keep=rules["keep"]
     )
 
-    print(clean_df)
+    print("\n\n\--------------------------- After -------------------------------------------\n\n",clean_df,"\n--------------------------------------------------------------------")
 
     # print(validate(df, clean_df))
 
