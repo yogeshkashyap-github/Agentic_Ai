@@ -28,7 +28,7 @@ def validate(old_df, new_df):
 def data_merger(df1,df2,on,how):
     return pd.merge(df1,df2,how=how,on=on)
 
-def agent_decide(user_query,excel_summary,sheet_naam):
+def agent_decide_duplicate(user_query,excel_summary,sheet_naam):
 
 
     SYSTEM_PROMPT = """
@@ -75,7 +75,7 @@ for sheet_name, df in sheets.items():
 
 
     user_query =  input("\n\nEnter Your Query How You want to Clean Data\n >>") or "Kindly remove the duplicates as per best column"
-    decision = agent_decide(user_query,summary,sheet_name)
+    decision = agent_decide_duplicate(user_query,summary,sheet_name)
 
 
     rules = json.loads(decision)    
@@ -132,7 +132,7 @@ def data_merger(df1,df2,on,how):
 
 
 
-def agent_decide(user_query,df1_summary,df2_summary):
+def agent_decide_merge(user_query,df1_summary,df2_summary):
 
     SYSTEM_PROMPT = """
     Your goal:
@@ -194,19 +194,35 @@ for sheet_name, df in sheets.items():
 
     user_query =  input("Enter the User Query to Merge the data : \n>>") or "Merge both"
     
-    decision = agent_decide(user_query,summary1,summary2)
+    decision = agent_decide_merge(user_query,summary1,summary2)
 
 
     rules = json.loads(decision)    
 
+
     joint = data_merger(super_df,df,rules["on"],str(rules["how"]))
 
-    print(joint)
+    joint_summary = summarize_excel(joint)
 
-    super_df = joint
+    decision = agent_decide_duplicate("Best suitable",joint_summary,sheet_name)
+
+
+    rules = json.loads(decision)    
+
+    merged_clean_df = remove_duplicates(
+        joint,
+        subset=rules["subset"],
+        keep=rules["keep"]
+    )
+
+
+
+
+    print(merged_clean_df)
+
+    super_df = merged_clean_df
 
     print("\n\n\n")
 
 
-super_df.to_excel("merged.xlsx",index=False)
  
